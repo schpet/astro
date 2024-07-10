@@ -1,5 +1,76 @@
 # astro
 
+## 4.11.6
+
+### Patch Changes
+
+- [#11437](https://github.com/withastro/astro/pull/11437) [`6ccb30e`](https://github.com/withastro/astro/commit/6ccb30e610eed34c2cc2c275485a8ac45c9b6b9e) Thanks [@NuroDev](https://github.com/NuroDev)! - Fixes a case where Astro's config `experimental.env.schema` keys did not allow numbers. Numbers are still not allowed as the first character to be able to generate valid JavaScript identifiers
+
+- [#11439](https://github.com/withastro/astro/pull/11439) [`08baf56`](https://github.com/withastro/astro/commit/08baf56f328ce4b6814a7f90089c0b3398d8bbfe) Thanks [@bholmesdev](https://github.com/bholmesdev)! - Expands the `isInputError()` utility from `astro:actions` to accept errors of any type. This should now allow type narrowing from a try / catch block.
+
+  ```ts
+  // example.ts
+  import { actions, isInputError } from 'astro:actions';
+
+  try {
+    await actions.like(new FormData());
+  } catch (error) {
+    if (isInputError(error)) {
+      console.log(error.fields);
+    }
+  }
+  ```
+
+- [#11438](https://github.com/withastro/astro/pull/11438) [`619f07d`](https://github.com/withastro/astro/commit/619f07db701ebab2d2f2598dd2dcf93ba1e5719c) Thanks [@bholmesdev](https://github.com/bholmesdev)! - Exposes utility types from `astro:actions` for the `defineAction` handler (`ActionHandler`) and the `ActionError` code (`ActionErrorCode`).
+
+- [#11337](https://github.com/withastro/astro/pull/11337) [`0a4b31f`](https://github.com/withastro/astro/commit/0a4b31ffeb41ad1dfb3141384e22787763fcae3d) Thanks [@florian-lefebvre](https://github.com/florian-lefebvre)! - Adds a new property `experimental.env.validateSecrets` to allow validating private variables on the server.
+
+  By default, this is set to `false` and only public variables are checked on start. If enabled, secrets will also be checked on start (dev/build modes). This is useful for example in some CIs to make sure all your secrets are correctly set before deploying.
+
+  ```js
+  // astro.config.mjs
+  import { defineConfig, envField } from 'astro/config';
+
+  export default defineConfig({
+    experimental: {
+      env: {
+        schema: {
+          // ...
+        },
+        validateSecrets: true,
+      },
+    },
+  });
+  ```
+
+- [#11443](https://github.com/withastro/astro/pull/11443) [`ea4bc04`](https://github.com/withastro/astro/commit/ea4bc04e9489c456e2b4b5dbd67d5e4cf3f89f97) Thanks [@bholmesdev](https://github.com/bholmesdev)! - Expose new `ActionReturnType` utility from `astro:actions`. This infers the return type of an action by passing `typeof actions.name` as a type argument. This example defines a `like` action that returns `likes` as an object:
+
+  ```ts
+  // actions/index.ts
+  import { defineAction } from 'astro:actions';
+
+  export const server = {
+    like: defineAction({
+      handler: () => {
+        /* ... */
+        return { likes: 42 };
+      },
+    }),
+  };
+  ```
+
+  In your client code, you can infer this handler return value with `ActionReturnType`:
+
+  ```ts
+  // client.ts
+  import { actions, ActionReturnType } from 'astro:actions';
+
+  type LikesResult = ActionReturnType<typeof actions.like>;
+  // -> { likes: number }
+  ```
+
+- [#11436](https://github.com/withastro/astro/pull/11436) [`7dca68f`](https://github.com/withastro/astro/commit/7dca68ff2e0f089a3fd090650ee05b1942792fed) Thanks [@bholmesdev](https://github.com/bholmesdev)! - Fixes `astro:actions` autocompletion for the `defineAction` `accept` property
+
 ## 4.11.5
 
 ### Patch Changes
